@@ -1,0 +1,103 @@
+<svg viewBox="-180 0 980 540" xmlns="http://www.w3.org/2000/svg" xmlns:xhtml="http://www.w3.org/1999/xhtml" font-family="sans-serif">
+
+    <!-- Axes -->
+    <text x="100" y="490" font-size="11" fill="#555">Low Investment</text>
+    <text x="540" y="490" text-anchor="end" font-size="11" fill="#555">High Investment</text>
+    <text x="320" y="510" text-anchor="middle" font-size="12" fill="#333" font-weight="bold">&#x2190; Investment Required &#x2192;</text>
+    <text x="82" y="460" text-anchor="start" font-size="11" fill="#555" transform="rotate(-90, 82, 460)">Low Accuracy</text>
+    <text x="82" y="40" text-anchor="end" font-size="11" fill="#555" transform="rotate(-90, 82, 40)">High Accuracy</text>
+    <text x="82" y="255" text-anchor="middle" font-size="12" fill="#333" font-weight="bold" transform="rotate(-90, 82, 255)">&#x2190; Intent Accuracy* &#x2192;</text>
+    <line x1="100" y1="460" x2="540" y2="460" stroke="#ccc" stroke-width="1"/>
+    <line x1="100" y1="40" x2="100" y2="460" stroke="#ccc" stroke-width="1"/>
+    <!-- Footnote -->
+    <text x="320" y="525" text-anchor="middle" font-size="9" fill="#888" font-style="italic">* How accurately the implementation reflects your original intent</text>
+
+    <!-- Quadrant backgrounds -->
+    <rect x="100" y="40" width="218" height="208" fill="#dbe8f4" opacity="0.5"/>
+    <rect x="322" y="40" width="218" height="208" fill="#d4edda" opacity="0.5"/>
+    <rect x="100" y="252" width="218" height="208" fill="#fff3cd" opacity="0.5"/>
+    <rect x="322" y="252" width="218" height="208" fill="#f8d7da" opacity="0.5"/>
+
+    <!-- Sweet spot ellipse -->
+    <ellipse cx="295" cy="175" rx="115" ry="65" fill="none" stroke="#f4a261" stroke-width="2.5" stroke-dasharray="8,4" opacity="0.8"/>
+    <text x="295" y="103" text-anchor="middle" font-size="11" fill="#e07b39" font-weight="bold">&#x1F3AF; Sweet Spot</text>
+
+    <!-- Quadrant labels -->
+    <text x="210" y="70" text-anchor="middle" font-size="12" fill="#4a7fb5" font-weight="bold">&#x2728; Magic</text>
+    <text x="430" y="70" text-anchor="middle" font-size="12" fill="#2d6a4f" font-weight="bold">&#x1F4CB; Spec Driven</text>
+    <text x="210" y="440" text-anchor="middle" font-size="12" fill="#888" font-weight="bold">&#x1F3B6; Vibe Coding</text>
+    <text x="430" y="440" text-anchor="middle" font-size="12" fill="#842029" font-weight="bold">&#x26A0; The Trap</text>
+
+    <!-- Data points -->
+    <!-- Default Planning dot -->
+    <circle cx="175" cy="370" r="10" fill="#999" opacity="0.85"/>
+    <text x="175" y="337" text-anchor="middle" font-size="11" fill="#666" font-weight="bold">Default</text>
+    <text x="175" y="350" text-anchor="middle" font-size="10" fill="#888">(Planning)</text>
+
+    <!-- Customized Planning dot -->
+    <circle cx="300" cy="295" r="10" fill="#b0b0b0" opacity="0.85"/>
+    <text x="300" y="262" text-anchor="middle" font-size="11" fill="#666" font-weight="bold">Custom Specs</text>
+    <text x="300" y="275" text-anchor="middle" font-size="10" fill="#888">(Interviewing Sub-Agent, Standards...)</text>
+
+    <!-- Arrow from Default to Customized -->
+    <defs>
+        <marker id="arrowGrey" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+            <path d="M0,0 L8,3 L0,6" fill="#999"/>
+        </marker>
+    </defs>
+    <line x1="185" y1="363" x2="290" y2="303" stroke="#999" stroke-width="2" stroke-dasharray="6,3" opacity="0.7" marker-end="url(#arrowGrey)"/>
+
+    <circle cx="329" cy="165" r="10" fill="#4a90d9" opacity="0.85"/>
+    <text x="329" y="149" text-anchor="middle" font-size="12" fill="#4a90d9" font-weight="bold">OpenSpec</text>
+
+    <circle cx="254" cy="220" r="10" fill="#2d6a4f" opacity="0.85"/>
+    <text x="254" y="207" text-anchor="middle" font-size="12" fill="#2d6a4f" font-weight="bold">GSD</text>
+
+    <circle cx="400" cy="155" r="10" fill="#c0392b" opacity="0.85"/>
+    <text x="400" y="139" text-anchor="middle" font-size="12" fill="#c0392b" font-weight="bold">SpecKit</text>
+
+    <circle cx="474" cy="133" r="10" fill="#6a0dad" opacity="0.85"/>
+    <text x="474" y="116" text-anchor="middle" font-size="12" fill="#6a0dad" font-weight="bold">BMAD</text>
+
+    <!-- Side notes — left -->
+    <line x1="244" y1="220" x2="60" y2="120" stroke="#2d6a4f" stroke-width="1" stroke-dasharray="4,3" opacity="0.4"/>
+    <rect x="-170" y="92" width="228" height="81" rx="6" fill="#fff" stroke="#2d6a4f" stroke-width="1" opacity="0.85"/>
+    <foreignObject x="-166" y="94" width="220" height="77">
+        <div xmlns="http://www.w3.org/1999/xhtml" style="font-family:sans-serif; text-align:center;">
+            <div style="font-size:10px; font-weight:bold; color:#2d6a4f; margin-bottom:2px;">GSD</div>
+            <div style="font-size:9px; color:#555; line-height:1.3;">Disposable planning artefacts with strong parallelization support. Solo-dev focused.<br /><br />Update: 2.0 was just released, now being itself a coding agent cli</div>
+        </div>
+    </foreignObject>
+
+    <line x1="319" y1="165" x2="60" y2="240" stroke="#4a90d9" stroke-width="1" stroke-dasharray="4,3" opacity="0.4"/>
+    <rect x="-170" y="222" width="228" height="76" rx="6" fill="#fff" stroke="#4a90d9" stroke-width="1" opacity="0.85"/>
+    <foreignObject x="-166" y="224" width="220" height="72">
+        <div xmlns="http://www.w3.org/1999/xhtml" style="font-family:sans-serif; text-align:center;">
+            <div style="font-size:10px; font-weight:bold; color:#4a90d9; margin-bottom:2px;">OpenSpec</div>
+            <div style="font-size:9px; color:#555; line-height:1.3;">Lightweight, easy brownfield adoption with BDD-style verification.<br /> Update existing specs when changes are needed.</div>
+        </div>
+    </foreignObject>
+
+    <!-- Side notes — right -->
+    <line x1="410" y1="155" x2="560" y2="250" stroke="#c0392b" stroke-width="1" stroke-dasharray="4,3" opacity="0.4"/>
+    <rect x="562" y="238" width="228" height="64" rx="6" fill="#fff" stroke="#c0392b" stroke-width="1" opacity="0.85"/>
+    <foreignObject x="566" y="240" width="220" height="60">
+        <div xmlns="http://www.w3.org/1999/xhtml" style="font-family:sans-serif; text-align:center;">
+            <div style="font-size:10px; font-weight:bold; color:#c0392b; margin-bottom:2px;">SpecKit</div>
+            <div style="font-size:9px; color:#555; line-height:1.3;">YAML-based specs with a constitution file for project-wide rules. Higher setup investment than OpenSpec.</div>
+        </div>
+    </foreignObject>
+
+    <line x1="484" y1="133" x2="560" y2="133" stroke="#6a0dad" stroke-width="1" stroke-dasharray="4,3" opacity="0.4"/>
+    <rect x="562" y="101" width="228" height="64" rx="6" fill="#fff" stroke="#6a0dad" stroke-width="1" opacity="0.85"/>
+    <foreignObject x="566" y="103" width="220" height="60">
+        <div xmlns="http://www.w3.org/1999/xhtml" style="font-family:sans-serif; text-align:center;">
+            <div style="font-size:10px; font-weight:bold; color:#6a0dad; margin-bottom:2px;">BMAD</div>
+            <div style="font-size:9px; color:#555; line-height:1.3;">Multi-persona pipeline with specialized subagents. Powerful but high setup overhead.</div>
+        </div>
+    </foreignObject>
+
+    <!-- Subnote -->
+    <text x="320" y="540" text-anchor="middle" font-size="10" fill="#999" font-style="italic">Many more frameworks available, e.g. Agent OS, spec-kitty, specs.md, &#x2026;</text>
+
+</svg>

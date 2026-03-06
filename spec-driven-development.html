@@ -1,0 +1,1421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spec Driven Development — From Chaos to Clarity</title>
+
+    <!-- Fonts: Be Vietnam Pro (headings/body) + Fira Code (mono accents) -->
+    <style>
+        @font-face { font-family: 'Be Vietnam Pro'; font-weight: 300; font-display: swap; src: url(fonts/be-vietnam-pro-300.woff2) format('woff2'); }
+        @font-face { font-family: 'Be Vietnam Pro'; font-weight: 400; font-display: swap; src: url(fonts/be-vietnam-pro-400.woff2) format('woff2'); }
+        @font-face { font-family: 'Be Vietnam Pro'; font-weight: 500; font-display: swap; src: url(fonts/be-vietnam-pro-500.woff2) format('woff2'); }
+        @font-face { font-family: 'Be Vietnam Pro'; font-weight: 600; font-display: swap; src: url(fonts/be-vietnam-pro-600.woff2) format('woff2'); }
+        @font-face { font-family: 'Be Vietnam Pro'; font-weight: 700; font-display: swap; src: url(fonts/be-vietnam-pro-700.woff2) format('woff2'); }
+        @font-face { font-family: 'Be Vietnam Pro'; font-weight: 800; font-display: swap; src: url(fonts/be-vietnam-pro-800.woff2) format('woff2'); }
+        @font-face { font-family: 'Fira Code'; font-weight: 400; font-display: swap; src: url(fonts/fira-code-400.woff2) format('woff2'); }
+        @font-face { font-family: 'Fira Code'; font-weight: 500; font-display: swap; src: url(fonts/fira-code-500.woff2) format('woff2'); }
+    </style>
+
+    <style>
+        /* ===========================================
+           CSS CUSTOM PROPERTIES (THEME)
+           =========================================== */
+        :root {
+            /* Colors — same palette as original */
+            --bg-primary: #0a1628;
+            --bg-card: rgba(207,255,178,0.04);
+            --bg-card-border: rgba(207,255,178,0.1);
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255,255,255,0.6);
+            --text-muted: rgba(255,255,255,0.3);
+            --accent: #CFFFB2;
+            --accent-dim: rgba(207,255,178,0.15);
+            --accent-glow: rgba(207,255,178,0.08);
+            --navy: #001F4B;
+            --navy-light: #0f2a52;
+
+            /* Typography */
+            --font-display: 'Be Vietnam Pro', sans-serif;
+            --font-mono: 'Fira Code', monospace;
+            --title-size: clamp(2.5rem, 6vw, 5rem);
+            --h2-size: clamp(1.8rem, 4.5vw, 3.5rem);
+            --h3-size: clamp(1.3rem, 2.5vw, 2rem);
+            --body-size: clamp(1.05rem, 1.7vw, 1.5rem);
+            --small-size: clamp(0.9rem, 1.2vw, 1.15rem);
+            --code-size: clamp(0.85rem, 1.1vw, 1.05rem);
+
+            /* Spacing */
+            --slide-padding: clamp(1.5rem, 4vw, 4rem);
+            --content-gap: clamp(0.8rem, 2vw, 2rem);
+            --element-gap: clamp(0.3rem, 1vw, 1rem);
+
+            /* Animation */
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+            --duration-normal: 0.6s;
+        }
+
+        /* ===========================================
+           RESET & BASE
+           =========================================== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        /* ===========================================
+           VIEWPORT FITTING: MANDATORY BASE STYLES
+           =========================================== */
+        html, body {
+            height: 100%;
+            overflow-x: hidden;
+        }
+        html {
+            scroll-snap-type: y mandatory;
+            scroll-behavior: smooth;
+        }
+        .slide {
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
+            overflow: hidden;
+            scroll-snap-align: start;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        .slide-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            max-height: 100%;
+            overflow: hidden;
+            padding: var(--slide-padding);
+        }
+        .card, .container, .content-box {
+            max-width: min(90vw, 1100px);
+            max-height: min(80vh, 700px);
+        }
+        .feature-list, .bullet-list {
+            gap: clamp(0.4rem, 1vh, 1rem);
+        }
+        .feature-list li, .bullet-list li {
+            font-size: var(--body-size);
+            line-height: 1.4;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
+            gap: clamp(0.5rem, 1.5vw, 1rem);
+        }
+        img, .image-container {
+            max-width: 100%;
+            max-height: min(50vh, 400px);
+            object-fit: contain;
+        }
+
+        /* Short viewports (< 700px height) */
+        @media (max-height: 700px) {
+            :root {
+                --slide-padding: clamp(0.75rem, 3vw, 2rem);
+                --content-gap: clamp(0.4rem, 1.5vw, 1rem);
+                --title-size: clamp(1.5rem, 5vw, 3rem);
+                --h2-size: clamp(1.3rem, 3.5vw, 2.2rem);
+            }
+        }
+        /* Very short viewports (< 600px height) */
+        @media (max-height: 600px) {
+            :root {
+                --slide-padding: clamp(0.5rem, 2.5vw, 1.5rem);
+                --content-gap: clamp(0.3rem, 1vw, 0.75rem);
+                --title-size: clamp(1.3rem, 4.5vw, 2.5rem);
+                --body-size: clamp(0.9rem, 1.4vw, 1.2rem);
+            }
+            .nav-dots, .keyboard-hint, .decorative { display: none; }
+        }
+        /* Extremely short (< 500px height) */
+        @media (max-height: 500px) {
+            :root {
+                --slide-padding: clamp(0.4rem, 2vw, 1rem);
+                --title-size: clamp(1.1rem, 4vw, 2rem);
+                --h2-size: clamp(1rem, 3vw, 1.5rem);
+                --body-size: clamp(0.85rem, 1.2vw, 1.05rem);
+            }
+        }
+        /* Narrow viewports (< 600px width) */
+        @media (max-width: 600px) {
+            :root { --title-size: clamp(1.5rem, 8vw, 3rem); }
+            .cards-2, .cards-3 { grid-template-columns: 1fr; }
+            .two-col { grid-template-columns: 1fr; }
+        }
+        /* Reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.2s !important;
+            }
+            html { scroll-behavior: auto; }
+        }
+
+        /* ===========================================
+           PRESENTATION THEME
+           =========================================== */
+        body {
+            background: var(--bg-primary);
+            font-family: var(--font-display);
+            color: var(--text-primary);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* --- Top bar --- */
+        .top-bar {
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: clamp(36px, 5vh, 52px);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 var(--slide-padding);
+            border-bottom: 1px solid var(--bg-card-border);
+            z-index: 10;
+        }
+        .top-bar .brand {
+            font-family: var(--font-mono);
+            font-size: var(--small-size);
+            color: var(--accent);
+            font-weight: 500;
+        }
+        .top-bar .slide-meta {
+            font-family: var(--font-mono);
+            font-size: clamp(0.65rem, 0.9vw, 0.85rem);
+            color: var(--text-muted);
+        }
+
+        /* --- Gradient orb background --- */
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .orb-1 {
+            width: clamp(200px, 40vw, 500px);
+            height: clamp(200px, 40vw, 500px);
+            right: -8vw; bottom: -12vh;
+            background: radial-gradient(circle, rgba(207,255,178,0.1) 0%, transparent 65%);
+        }
+        .orb-2 {
+            width: clamp(150px, 25vw, 350px);
+            height: clamp(150px, 25vw, 350px);
+            left: -5vw; top: 10vh;
+            background: radial-gradient(circle, rgba(0,31,75,0.5) 0%, transparent 65%);
+        }
+
+        /* --- Section label chip --- */
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5em;
+            font-family: var(--font-mono);
+            font-size: var(--small-size);
+            color: var(--accent);
+            background: var(--accent-glow);
+            border: 1px solid rgba(207,255,178,0.18);
+            padding: 0.3em 0.9em;
+            border-radius: 100px;
+            margin-bottom: var(--content-gap);
+            width: fit-content;
+        }
+        .chip::before {
+            content: '';
+            width: 6px; height: 6px;
+            background: var(--accent);
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        /* --- Headings --- */
+        .slide h1 {
+            font-weight: 800;
+            font-size: var(--title-size);
+            line-height: 1.1;
+            margin-bottom: var(--element-gap);
+        }
+        .slide h2 {
+            font-weight: 700;
+            font-size: var(--h2-size);
+            line-height: 1.15;
+            margin-bottom: var(--content-gap);
+        }
+        .slide h3 {
+            font-weight: 600;
+            font-size: var(--h3-size);
+            line-height: 1.25;
+            margin-bottom: var(--element-gap);
+        }
+        .highlight {
+            background: linear-gradient(135deg, #CFFFB2, #7defa0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* --- Body text --- */
+        .body-text {
+            font-size: var(--body-size);
+            color: var(--text-secondary);
+            font-weight: 300;
+            line-height: 1.6;
+            max-width: 700px;
+        }
+
+        /* --- Bullet lists --- */
+        .bullets {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: clamp(0.5rem, 1vh, 0.9rem);
+        }
+        .bullets li {
+            font-size: var(--body-size);
+            color: var(--text-secondary);
+            font-weight: 400;
+            line-height: 1.5;
+            padding-left: 1.4em;
+            position: relative;
+        }
+        .bullets li::before {
+            content: '\203A';
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+            font-weight: 700;
+        }
+
+        /* --- Cards grid --- */
+        .cards {
+            display: grid;
+            gap: clamp(0.6rem, 1.5vw, 1.2rem);
+        }
+        .cards-2 { grid-template-columns: repeat(2, 1fr); }
+        .cards-3 { grid-template-columns: repeat(3, 1fr); }
+        @media (max-width: 700px) {
+            .cards-2, .cards-3 { grid-template-columns: 1fr; }
+        }
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--bg-card-border);
+            border-radius: 8px;
+            padding: clamp(0.9rem, 1.8vw, 1.5rem);
+            max-height: none;
+        }
+        .card h3 {
+            font-size: clamp(1.05rem, 1.6vw, 1.35rem);
+            color: var(--text-primary);
+            margin-bottom: clamp(0.3rem, 0.6vw, 0.5rem);
+        }
+        .card p {
+            font-size: var(--small-size);
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+        .card .card-icon {
+            font-size: clamp(1.4rem, 2.5vw, 2rem);
+            margin-bottom: clamp(0.3rem, 0.6vw, 0.5rem);
+        }
+
+        /* --- Code blocks --- */
+        .code-block {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--bg-card-border);
+            border-radius: 8px;
+            padding: clamp(0.8rem, 1.8vw, 1.5rem);
+            font-family: var(--font-mono);
+            font-size: var(--code-size);
+            line-height: 1.65;
+            color: rgba(255,255,255,0.8);
+            overflow: hidden;
+            max-width: min(90vw, 800px);
+        }
+        .code-block .key { color: #CFFFB2; }
+        .code-block .string { color: #f1fa8c; }
+        .code-block .comment { color: rgba(255,255,255,0.35); }
+        .code-block .type { color: #8be9fd; }
+
+        /* --- Two-column layout --- */
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: clamp(1rem, 3vw, 3rem);
+            align-items: start;
+        }
+        @media (max-width: 700px) {
+            .two-col { grid-template-columns: 1fr; }
+        }
+
+        /* --- Divider line --- */
+        .divider {
+            width: clamp(30px, 4vw, 60px);
+            height: 2px;
+            background: var(--accent);
+            margin-bottom: var(--content-gap);
+        }
+
+        /* --- Quote styling --- */
+        .quote-text {
+            font-size: clamp(1.4rem, 3.2vw, 2.8rem);
+            font-weight: 300;
+            line-height: 1.35;
+            color: var(--text-primary);
+            font-style: italic;
+            max-width: min(90vw, 850px);
+            position: relative;
+        }
+        .quote-text::before {
+            content: '\201C';
+            position: absolute;
+            left: calc(-1 * clamp(0.5rem, 1.5vw, 1.2rem));
+            top: calc(-1 * clamp(0.3rem, 1vw, 0.8rem));
+            font-size: clamp(3rem, 7vw, 6rem);
+            color: var(--accent);
+            opacity: 0.3;
+            font-style: normal;
+            line-height: 1;
+        }
+        .quote-attribution {
+            font-size: var(--body-size);
+            color: var(--accent);
+            font-weight: 500;
+            margin-top: var(--content-gap);
+        }
+
+        /* --- Comparison table --- */
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: var(--small-size);
+        }
+        .comparison-table th {
+            text-align: left;
+            padding: clamp(0.4rem, 0.8vw, 0.7rem) clamp(0.5rem, 1vw, 0.8rem);
+            color: var(--accent);
+            font-family: var(--font-mono);
+            font-weight: 500;
+            border-bottom: 1px solid rgba(207,255,178,0.2);
+            font-size: var(--small-size);
+        }
+        .comparison-table td {
+            padding: clamp(0.4rem, 0.8vw, 0.7rem) clamp(0.5rem, 1vw, 0.8rem);
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--bg-card-border);
+            font-size: clamp(0.8rem, 1.1vw, 1rem);
+        }
+        .comparison-table tr:last-child td {
+            border-bottom: none;
+        }
+        .comparison-table td:first-child {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        /* --- Versus layout --- */
+        .vs-container {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: clamp(0.5rem, 1.5vw, 1.5rem);
+            align-items: center;
+            max-width: min(90vw, 900px);
+        }
+        .vs-divider {
+            font-family: var(--font-mono);
+            font-size: clamp(1.2rem, 2vw, 1.8rem);
+            color: var(--accent);
+            font-weight: 700;
+        }
+        @media (max-width: 700px) {
+            .vs-container { grid-template-columns: 1fr; }
+            .vs-divider { text-align: center; }
+        }
+
+        /* ===========================================
+           ANIMATIONS — Reveal on scroll
+           =========================================== */
+        .reveal {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity var(--duration-normal) var(--ease-out-expo),
+                        transform var(--duration-normal) var(--ease-out-expo);
+        }
+        .slide.visible .reveal {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .reveal:nth-child(1) { transition-delay: 0.05s; }
+        .reveal:nth-child(2) { transition-delay: 0.12s; }
+        .reveal:nth-child(3) { transition-delay: 0.19s; }
+        .reveal:nth-child(4) { transition-delay: 0.26s; }
+        .reveal:nth-child(5) { transition-delay: 0.33s; }
+        .reveal:nth-child(6) { transition-delay: 0.40s; }
+
+        /* --- Progress bar --- */
+        .progress-bar {
+            position: fixed;
+            top: 0; left: 0;
+            height: 3px;
+            background: var(--accent);
+            z-index: 9999;
+            transition: width 0.3s ease;
+            box-shadow: 0 0 8px rgba(207,255,178,0.4);
+        }
+
+        /* --- Nav dots --- */
+        .nav-dots {
+            position: fixed;
+            right: clamp(0.8rem, 1.5vw, 1.5rem);
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: clamp(4px, 0.5vh, 8px);
+            z-index: 1000;
+        }
+        .nav-dot {
+            width: clamp(6px, 0.6vw, 9px);
+            height: clamp(6px, 0.6vw, 9px);
+            border-radius: 50%;
+            background: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            padding: 0;
+        }
+        .nav-dot.active {
+            background: var(--accent);
+            transform: scale(1.4);
+        }
+
+        /* Nav dots on light slides */
+        .nav-dots.on-light .nav-dot {
+            background: rgba(0,31,75,0.25);
+        }
+        .nav-dots.on-light .nav-dot.active {
+            background: var(--navy);
+        }
+
+        /* --- Slide content padding for top bar --- */
+        .slide .slide-content {
+            padding-top: clamp(3rem, 7vh, 5rem);
+        }
+
+        /* --- Title slide special --- */
+        .title-slide .slide-content {
+            justify-content: center;
+            padding-left: clamp(2rem, 6vw, 8rem);
+        }
+
+        /* --- End slide --- */
+        .end-slide .slide-content {
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        /* ===========================================
+           LIGHT SLIDE THEME
+           =========================================== */
+        .slide.light {
+            background: #f8f9fa;
+        }
+        .slide.light .top-bar {
+            border-bottom-color: rgba(0,31,75,0.1);
+        }
+        .slide.light .top-bar .brand {
+            color: var(--navy);
+        }
+        .slide.light .top-bar .slide-meta {
+            color: rgba(0,31,75,0.35);
+        }
+        .slide.light .chip {
+            color: var(--navy);
+            background: rgba(0,31,75,0.06);
+            border-color: rgba(0,31,75,0.15);
+        }
+        .slide.light .chip::before {
+            background: var(--navy);
+        }
+        .slide.light h2,
+        .slide.light h3 {
+            color: #0a1628;
+        }
+        .slide.light .highlight {
+            background: linear-gradient(135deg, #001F4B, #1a4a7a);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .slide.light .body-text {
+            color: rgba(10,22,40,0.65);
+        }
+        .slide.light .bullets li {
+            color: rgba(10,22,40,0.7);
+        }
+        .slide.light .bullets li::before {
+            color: var(--navy);
+        }
+        .slide.light .card {
+            background: #ffffff;
+            border-color: rgba(0,31,75,0.08);
+            box-shadow: 0 1px 3px rgba(0,31,75,0.06);
+        }
+        .slide.light .card h3 {
+            color: #0a1628;
+        }
+        .slide.light .card p {
+            color: rgba(10,22,40,0.6);
+        }
+        .slide.light .code-block {
+            background: #0a1628;
+            border-color: rgba(0,31,75,0.15);
+        }
+        .slide.light .orb-1 {
+            background: radial-gradient(circle, rgba(0,31,75,0.04) 0%, transparent 65%);
+        }
+        .slide.light .orb-2 {
+            background: radial-gradient(circle, rgba(207,255,178,0.12) 0%, transparent 65%);
+        }
+        .slide.light .divider {
+            background: var(--navy);
+        }
+
+        /* --- Pipeline / timeline for sequential artifacts --- */
+        .pipeline {
+            display: flex;
+            align-items: flex-start;
+            gap: 0;
+            width: 100%;
+            max-width: min(95vw, 1200px);
+            flex: 1;
+            padding: clamp(1rem, 3vw, 3rem) 0;
+        }
+        .pipeline-step {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            position: relative;
+        }
+        .pipeline-step:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            top: clamp(40px, 6vw, 70px);
+            left: calc(50% + clamp(40px, 6vw, 70px));
+            width: calc(100% - clamp(80px, 12vw, 140px));
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent), rgba(207,255,178,0.2));
+            opacity: 0.5;
+        }
+        .pipeline-icon {
+            width: clamp(80px, 12vw, 140px);
+            height: clamp(80px, 12vw, 140px);
+            border-radius: 50%;
+            background: var(--accent-dim);
+            border: 3px solid var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: clamp(2rem, 4.5vw, 4rem);
+            margin-bottom: clamp(0.8rem, 2vw, 1.5rem);
+            position: relative;
+            z-index: 1;
+            box-shadow: 0 0 30px rgba(207,255,178,0.1);
+        }
+        .pipeline-step h3 {
+            font-size: clamp(1.1rem, 2vw, 1.6rem);
+            color: var(--text-primary);
+            margin-bottom: clamp(0.3rem, 0.6vw, 0.5rem);
+        }
+        .pipeline-step p {
+            font-size: clamp(0.85rem, 1.2vw, 1.1rem);
+            color: var(--text-secondary);
+            line-height: 1.5;
+            max-width: 220px;
+        }
+        .pipeline-box {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--bg-card-border);
+            border-radius: 8px;
+            padding: clamp(0.5rem, 1vw, 0.8rem);
+            margin-top: clamp(0.4rem, 0.8vw, 0.6rem);
+            font-family: var(--font-mono);
+            font-size: clamp(0.7rem, 0.9vw, 0.85rem);
+            line-height: 1.55;
+            color: rgba(255,255,255,0.7);
+            text-align: left;
+            width: 100%;
+            max-width: 220px;
+        }
+        .pipeline-box .key { color: #CFFFB2; }
+        .pipeline-box .val { color: #f1fa8c; }
+        .pipeline-label {
+            font-family: var(--font-mono);
+            font-size: clamp(0.65rem, 0.9vw, 0.8rem);
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: clamp(0.3rem, 0.6vw, 0.5rem);
+            opacity: 0.7;
+        }
+        .phase-flow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: clamp(0.5rem, 1.5vw, 1.2rem);
+            margin-top: clamp(0.8rem, 2vw, 1.5rem);
+            width: 100%;
+        }
+        .phase-pill {
+            font-family: var(--font-mono);
+            font-size: clamp(0.8rem, 1.1vw, 1rem);
+            font-weight: 600;
+            padding: clamp(0.3rem, 0.6vw, 0.5rem) clamp(0.8rem, 1.5vw, 1.2rem);
+            border-radius: 20px;
+            color: var(--text-primary);
+        }
+        .phase-pill.propose { background: rgba(33,150,243,0.2); border: 1px solid rgba(33,150,243,0.4); }
+        .phase-pill.apply { background: rgba(255,152,0,0.2); border: 1px solid rgba(255,152,0,0.4); }
+        .phase-pill.archive { background: rgba(76,175,80,0.2); border: 1px solid rgba(76,175,80,0.4); }
+        .phase-arrow {
+            color: var(--text-muted);
+            font-size: clamp(1rem, 1.5vw, 1.3rem);
+        }
+        @media (max-width: 700px) {
+            .pipeline {
+                flex-direction: column;
+                align-items: stretch;
+                gap: clamp(0.5rem, 1.5vw, 1rem);
+            }
+            .pipeline-step {
+                flex-direction: row;
+                text-align: left;
+                gap: clamp(0.5rem, 1.5vw, 1rem);
+            }
+            .pipeline-step p { max-width: none; }
+            .pipeline-icon {
+                width: clamp(50px, 8vw, 70px);
+                height: clamp(50px, 8vw, 70px);
+                font-size: clamp(1.5rem, 3vw, 2rem);
+            }
+            .pipeline-step:not(:last-child)::after {
+                top: clamp(50px, 8vw, 70px);
+                left: clamp(25px, 4vw, 35px);
+                width: 2px;
+                height: calc(100% - clamp(25px, 4vw, 35px));
+            }
+        }
+        .slide.light .quote-text {
+            color: #0a1628;
+        }
+        .slide.light .quote-text::before {
+            color: var(--navy);
+        }
+        .slide.light .quote-attribution {
+            color: var(--navy);
+        }
+        .slide.light .comparison-table th {
+            color: var(--navy);
+            border-bottom-color: rgba(0,31,75,0.2);
+        }
+        .slide.light .comparison-table td {
+            color: rgba(10,22,40,0.7);
+            border-bottom-color: rgba(0,31,75,0.08);
+        }
+        .slide.light .comparison-table td:first-child {
+            color: #0a1628;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Progress bar -->
+    <div class="progress-bar" id="progressBar"></div>
+
+    <!-- Navigation dots -->
+    <nav class="nav-dots" id="navDots" aria-label="Slide navigation"></nav>
+
+    <!-- ===========================================
+         SLIDE 1: TITLE
+         =========================================== -->
+    <section class="slide title-slide" data-title="Title">
+        <div class="top-bar">
+            <span class="brand">Spec Driven Development</span>
+            <span class="slide-meta">B310 Digital &middot; Agentic Conf &middot; 2026</span>
+        </div>
+        <div class="orb orb-1"></div>
+        <div class="slide-content">
+            <div class="chip reveal">SDD</div>
+            <h1 class="reveal">Beyond the Vibes</h1>
+            <p class="body-text reveal">Lessons from Using Spec Driven Development Frameworks for Agentic Coding</p>
+            <p class="body-text reveal" style="margin-top: var(--content-gap); color: var(--accent); font-weight: 500;">Jannik Streek &middot; B310 Digital &middot; Agentic Conf</p>
+        </div>
+    </section>
+
+    <!-- ===========================================
+         SLIDE 2: OPENING QUOTE
+         =========================================== -->
+    <section class="slide" data-title="Quote">
+        <div class="top-bar">
+            <span class="brand">SDD</span>
+            <span class="slide-meta">Opening</span>
+        </div>
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="slide-content" style="justify-content: center; align-items: center; text-align: center;">
+            <div class="reveal" style="padding: 0 clamp(1rem, 4vw, 4rem);">
+                <div class="quote-text" style="text-align: left;">
+                    No code without spec
+                </div>
+                <div class="quote-attribution reveal" style="text-align: left;">Joel on Software &middot; Spolsky &mdash; <a href="https://www.joelonsoftware.com/2000/08/09/the-joel-test-12-steps-to-better-code/" target="_blank" rel="noopener" style="color: var(--accent); text-decoration: underline;">The Joel Test</a></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===========================================
+         SLIDE 3: WHAT IS A SPEC?
+         =========================================== -->
+    <section class="slide" data-title="What is a Spec?">
+        <div class="top-bar">
+            <span class="brand">Foundations</span>
+            <span class="slide-meta">What is a Spec?</span>
+        </div>
+        <div class="orb orb-1"></div>
+        <div class="slide-content">
+            <div class="chip reveal">Definition</div>
+            <h2 class="reveal">What is a <span class="highlight">Spec</span>?</h2>
+            <p class="body-text reveal">There's no single definition &mdash; but Joel Spolsky distinguished two types that are both relevant in SDD.</p>
+            <div class="vs-container reveal" style="margin-top: var(--content-gap);">
+                <div class="card">
+                    <div class="card-icon">&#x1F4CB;</div>
+                    <h3>Functional Spec</h3>
+                    <ul class="bullets">
+                        <li>Describes system behavior <strong style="color:var(--accent);">from the outside</strong></li>
+                        <li>Persistent and referenceable</li>
+                        <li>Updated when the need arises</li>
+                    </ul>
+                </div>
+                <div class="vs-divider">+</div>
+                <div class="card">
+                    <div class="card-icon">&#x2699;</div>
+                    <h3>Technical Spec</h3>
+                    <ul class="bullets">
+                        <li>Architecture, data models, APIs</li>
+                        <li>Covers constraints and trade-offs</li>
+                        <li>Aimed at the <strong style="color:var(--accent);">implementer</strong></li>
+                    </ul>
+                </div>
+            </div>
+            <p class="body-text reveal" style="margin-top: var(--content-gap); font-style: italic; color: var(--accent);">Different frameworks use different names, e.g. Product Requirement Documents (PRD) ... </p>
+        </div>
+    </section>
+
+    <!-- ===========================================
+         SLIDE 5: SPEC ARTEFACTS (OpenSpec example)
+         =========================================== -->
+    <section class="slide" data-title="Spec Artefacts">
+        <div class="top-bar">
+            <span class="brand">Example</span>
+            <span class="slide-meta">OpenSpec Artefacts</span>
+        </div>
+        <div class="orb orb-1"></div>
+        <div class="slide-content" style="align-items: center;">
+            <div class="chip reveal">OpenSpec Example</div>
+            <h2 class="reveal">It's more than <span class="highlight">one file</span></h2>
+            <div class="pipeline reveal">
+                <div class="pipeline-step">
+                    <div class="pipeline-label">&nbsp;</div>
+                    <div class="pipeline-icon">&#x1F4DC;</div>
+                    <h3>Config</h3>
+                    <div class="pipeline-box">
+                        <span class="key">rules:</span> <span class="val">no breaking changes</span><br>
+                        <span class="key">style:</span> <span class="val">RESTful, JSON API</span><br>
+                        <span class="key">review:</span> <span class="val">spec before code</span>
+                    </div>
+                </div>
+                <div class="pipeline-step">
+                    <div class="pipeline-label">Why</div>
+                    <div class="pipeline-icon">&#x1F4DD;</div>
+                    <h3>Proposal</h3>
+                    <div class="pipeline-box">
+                        <span class="key">Why:</span> <span class="val">users can't find content</span><br>
+                        <span class="key">Non-goal:</span> <span class="val">full-text search</span><br>
+                        <span class="key">Non-goal:</span> <span class="val">search analytics</span>
+                    </div>
+                </div>
+                <div class="pipeline-step">
+                    <div class="pipeline-label">Verification</div>
+                    <div class="pipeline-icon">&#x1F9EA;</div>
+                    <h3>Specs</h3>
+                    <div class="pipeline-box">
+                        <span class="key">Given</span> <span class="val">user on search</span><br>
+                        <span class="key">When</span> <span class="val">selects tag "css"</span><br>
+                        <span class="key">Then</span> <span class="val">results filtered</span>
+                    </div>
+                </div>
+                <div class="pipeline-step">
+                    <div class="pipeline-label">How</div>
+                    <div class="pipeline-icon">&#x1F4D0;</div>
+                    <h3>Design</h3>
+                    <div class="pipeline-box">
+                        <span class="key">Goal:</span> <span class="val">fast tag-based search</span><br>
+                        <span class="key">Decision:</span> <span class="val">use inverted index</span><br>
+                        <span class="key">Risk:</span> <span class="val">slow queries on large data</span>
+                    </div>
+                </div>
+                <div class="pipeline-step">
+                    <div class="pipeline-label">&nbsp;</div>
+                    <div class="pipeline-icon">&#x2705;</div>
+                    <h3>Task List</h3>
+                    <div class="pipeline-box">
+                        &#x2610; add tag model<br>
+                        &#x2610; build filter API<br>
+                        &#x2610; update search UI
+                    </div>
+                </div>
+            </div>
+            <div class="phase-flow reveal">
+                <span class="phase-pill propose">Propose</span>
+                <span class="phase-arrow">&rarr;</span>
+                <span class="phase-pill apply">Apply</span>
+                <span class="phase-arrow">&rarr;</span>
+                <span class="phase-pill archive">Archive</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===========================================
+         SLIDE 6: THE PROBLEM WITH AGENTIC CODING
+         =========================================== -->
+    <section class="slide light" data-title="Reasons to Consider SDD">
+        <div class="top-bar">
+            <span class="brand">Motivation</span>
+            <span class="slide-meta">Reasons to Consider SDD</span>
+        </div>
+        <div class="orb orb-2"></div>
+        <div class="slide-content">
+            <div class="chip reveal">Reality Check</div>
+            <h2 class="reveal">Reasons to consider <span class="highlight">SDD</span></h2>
+            <div class="cards cards-2 reveal" style="margin-top: var(--element-gap);">
+                <div class="card">
+                    <div class="card-icon">&#x23F3;</div>
+                    <h3>Enable long-running sessions</h3>
+                    <p>Specs give agents a detailed instruction set &mdash; they run longer autonomously without losing direction.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">&#x1F300;</div>
+                    <h3>Avoid the iteration time trap</h3>
+                    <p>Iterating with vibe coding towards a solution works, but often leaves dead code and misfit architecture behind. Upfront specs reduce rework by getting direction right early.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">&#x1F6A7;</div>
+                    <h3>Prevent misinterpreted intent</h3>
+                    <p>Vague prompts lead to confidently wrong output. Specs make intent explicit &mdash; no guessing.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">&#x1F91D;</div>
+                    <h3>Communication base for stakeholders</h3>
+                    <p>When specs become the source of truth, they serve as both an implementation guide and a standard / contract between stakeholders.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===========================================
+         SLIDE 8: FRAMEWORK COMPARISON
+         =========================================== -->
+    <section class="slide light" data-title="Framework Comparison" id="frameworkSlide">
+        <div class="top-bar">
+            <span class="brand">Frameworks</span>
+            <span class="slide-meta">Comparison</span>
+        </div>
+        <div class="orb orb-2"></div>
+        <div class="slide-content" style="align-items: center; padding-top: clamp(2.5rem, 6vh, 4rem);">
+            <div class="chip reveal">Landscape</div>
+            <h2 class="reveal"><span class="highlight">Opinionated</span> framework comparison</h2>
+            <div class="reveal" style="flex: 1; display: flex; justify-content: center; align-items: center; min-height: 0; width: 100%;">
+                <svg id="frameworkChart" viewBox="-180 0 980 540" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif" style="width: 100%; height: 100%; max-height: calc(100vh - clamp(8rem, 16vh, 12rem));">
+
+                    <!-- LAYER 1: Axes (always visible) -->
+                    <g id="chartAxes">
+                        <!-- X axis labels -->
+                        <text x="100" y="490" font-size="11" fill="#555">Low Investment</text>
+                        <text x="540" y="490" text-anchor="end" font-size="11" fill="#555">High Investment</text>
+                        <text x="320" y="510" text-anchor="middle" font-size="12" fill="#333" font-weight="bold">&larr; Investment Required &rarr;</text>
+                        <!-- Y axis labels -->
+                        <text x="82" y="460" text-anchor="start" font-size="11" fill="#555" transform="rotate(-90, 82, 460)">Low Accuracy</text>
+                        <text x="82" y="40" text-anchor="end" font-size="11" fill="#555" transform="rotate(-90, 82, 40)">High Accuracy</text>
+                        <text x="82" y="255" text-anchor="middle" font-size="12" fill="#333" font-weight="bold" transform="rotate(-90, 82, 255)">&larr; Intent Accuracy* &rarr;</text>
+                        <!-- Axis lines -->
+                        <line x1="100" y1="460" x2="540" y2="460" stroke="#ccc" stroke-width="1"/>
+                        <line x1="100" y1="40" x2="100" y2="460" stroke="#ccc" stroke-width="1"/>
+                        <!-- Footnote -->
+                        <text x="320" y="525" text-anchor="middle" font-size="9" fill="#888" font-style="italic">* How accurately the implementation reflects your original intent</text>
+                    </g>
+
+                    <!-- LAYER 2: Quadrant sections (hidden initially, renders below dots) -->
+                    <g id="chartSections" style="opacity: 0; transition: opacity 0.6s ease;">
+                        <!-- Quadrant backgrounds -->
+                        <rect x="100" y="40" width="218" height="208" fill="#dbe8f4" opacity="0.5"/>
+                        <rect x="322" y="40" width="218" height="208" fill="#d4edda" opacity="0.5"/>
+                        <rect x="100" y="252" width="218" height="208" fill="#fff3cd" opacity="0.5"/>
+                        <rect x="322" y="252" width="218" height="208" fill="#f8d7da" opacity="0.5"/>
+
+                        <!-- Sweet spot ellipse -->
+                        <ellipse cx="295" cy="175" rx="115" ry="65" fill="none" stroke="#f4a261" stroke-width="2.5" stroke-dasharray="8,4" opacity="0.8"/>
+                        <text x="295" y="103" text-anchor="middle" font-size="11" fill="#e07b39" font-weight="bold">&#x1F3AF; Sweet Spot</text>
+
+                        <!-- Quadrant labels -->
+                        <text x="210" y="70" text-anchor="middle" font-size="12" fill="#4a7fb5" font-weight="bold">&#x2728; Magic</text>
+                        <text x="430" y="70" text-anchor="middle" font-size="12" fill="#2d6a4f" font-weight="bold">&#x1F4CB; Spec Driven</text>
+                        <text x="210" y="440" text-anchor="middle" font-size="12" fill="#888" font-weight="bold">&#x1F3B6; Vibe Coding</text>
+                        <text x="430" y="440" text-anchor="middle" font-size="12" fill="#842029" font-weight="bold">&#x26A0; The Trap</text>
+                    </g>
+
+                    <!-- LAYER 3: Data points (hidden initially, renders above sections) -->
+                    <g id="chartDots" style="opacity: 0; transition: opacity 0.6s ease;">
+                        <!-- Default Planning dot -->
+                        <circle cx="175" cy="370" r="10" fill="#999" opacity="0.85"/>
+                        <text x="175" y="337" text-anchor="middle" font-size="11" fill="#666" font-weight="bold">Default</text>
+                        <text x="175" y="350" text-anchor="middle" font-size="10" fill="#888">(Planning)</text>
+
+                        <!-- Customized Planning dot -->
+                        <circle cx="300" cy="295" r="10" fill="#b0b0b0" opacity="0.85"/>
+                        <text x="300" y="262" text-anchor="middle" font-size="11" fill="#666" font-weight="bold">Custom Specs</text>
+                        <text x="300" y="275" text-anchor="middle" font-size="10" fill="#888">(Interviewing Sub-Agent, Standards...)</text>
+
+                        <!-- Arrow from Default to Customized -->
+                        <defs>
+                            <marker id="arrowGrey" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+                                <path d="M0,0 L8,3 L0,6" fill="#999"/>
+                            </marker>
+                        </defs>
+                        <line x1="185" y1="363" x2="290" y2="303" stroke="#999" stroke-width="2" stroke-dasharray="6,3" opacity="0.7" marker-end="url(#arrowGrey)"/>
+
+                        <circle cx="329" cy="165" r="10" fill="#4a90d9" opacity="0.85"/>
+                        <text x="329" y="149" text-anchor="middle" font-size="12" fill="#4a90d9" font-weight="bold">OpenSpec</text>
+
+                        <circle cx="254" cy="220" r="10" fill="#2d6a4f" opacity="0.85"/>
+                        <text x="254" y="207" text-anchor="middle" font-size="12" fill="#2d6a4f" font-weight="bold">GSD</text>
+
+                        <circle cx="400" cy="155" r="10" fill="#c0392b" opacity="0.85"/>
+                        <text x="400" y="139" text-anchor="middle" font-size="12" fill="#c0392b" font-weight="bold">SpecKit</text>
+
+                        <circle cx="474" cy="133" r="10" fill="#6a0dad" opacity="0.85"/>
+                        <text x="474" y="116" text-anchor="middle" font-size="12" fill="#6a0dad" font-weight="bold">BMAD</text>
+                    </g>
+
+                    <!-- LAYER 4: Side notes (hidden initially, appears with dots) -->
+                    <g id="chartNotes" style="opacity: 0; transition: opacity 0.6s ease;">
+                        <!-- GSD — left side (top) -->
+                        <line x1="244" y1="220" x2="60" y2="120" stroke="#2d6a4f" stroke-width="1" stroke-dasharray="4,3" opacity="0.4"/>
+                        <rect x="-170" y="92" width="228" height="81" rx="6" fill="#fff" stroke="#2d6a4f" stroke-width="1" opacity="0.85"/>
+                        <foreignObject x="-166" y="94" width="220" height="77">
+                            <div xmlns="http://www.w3.org/1999/xhtml" style="font-family:sans-serif; text-align:center;">
+                                <div style="font-size:10px; font-weight:bold; color:#2d6a4f; margin-bottom:2px;">GSD</div>
+                                <div style="font-size:9px; color:#555; line-height:1.3;">Disposable planning artefacts with strong parallelization support. Solo-dev focused.<br /><br />Update: 2.0 was just released, now being itself a coding agent cli</div>
+                            </div>
+                        </foreignObject>
+
+                        <!-- OpenSpec — left side (below GSD) -->
+                        <line x1="319" y1="165" x2="60" y2="240" stroke="#4a90d9" stroke-width="1" stroke-dasharray="4,3" opacity="0.4"/>
+                        <rect x="-170" y="222" width="228" height="76" rx="6" fill="#fff" stroke="#4a90d9" stroke-width="1" opacity="0.85"/>
+                        <foreignObject x="-166" y="224" width="220" height="72">
+                            <div xmlns="http://www.w3.org/1999/xhtml" style="font-family:sans-serif; text-align:center;">
+                                <div style="font-size:10px; font-weight:bold; color:#4a90d9; margin-bottom:2px;">OpenSpec</div>
+                                <div style="font-size:9px; color:#555; line-height:1.3;">Lightweight, easy brownfield adoption with BDD-style verification.<br /> Update existing specs when changes are needed.</div>
+                            </div>
+                        </foreignObject>
+
+                        <!-- SpecKit — right side (below BMAD) -->
+                        <line x1="410" y1="155" x2="560" y2="250" stroke="#c0392b" stroke-width="1" stroke-dasharray="4,3" opacity="0.4"/>
+                        <rect x="562" y="238" width="228" height="64" rx="6" fill="#fff" stroke="#c0392b" stroke-width="1" opacity="0.85"/>
+                        <foreignObject x="566" y="240" width="220" height="60">
+                            <div xmlns="http://www.w3.org/1999/xhtml" style="font-family:sans-serif; text-align:center;">
+                                <div style="font-size:10px; font-weight:bold; color:#c0392b; margin-bottom:2px;">SpecKit</div>
+                                <div style="font-size:9px; color:#555; line-height:1.3;">YAML-based specs with a constitution file for project-wide rules. Higher setup investment than OpenSpec.</div>
+                            </div>
+                        </foreignObject>
+
+                        <!-- BMAD — right side -->
+                        <line x1="484" y1="133" x2="560" y2="133" stroke="#6a0dad" stroke-width="1" stroke-dasharray="4,3" opacity="0.4"/>
+                        <rect x="562" y="101" width="228" height="64" rx="6" fill="#fff" stroke="#6a0dad" stroke-width="1" opacity="0.85"/>
+                        <foreignObject x="566" y="103" width="220" height="60">
+                            <div xmlns="http://www.w3.org/1999/xhtml" style="font-family:sans-serif; text-align:center;">
+                                <div style="font-size:10px; font-weight:bold; color:#6a0dad; margin-bottom:2px;">BMAD</div>
+                                <div style="font-size:9px; color:#555; line-height:1.3;">Multi-persona pipeline with specialized subagents. Powerful but high setup overhead.</div>
+                            </div>
+                        </foreignObject>
+
+
+                    </g>
+                </svg>
+            </div>
+            <p id="chartSubnote" style="font-size: var(--small-size); color: rgba(10,22,40,0.45); font-style: italic; margin-top: clamp(0.3rem, 0.8vw, 0.6rem); opacity: 0; transition: opacity 0.6s ease;">Many more frameworks available, e.g. Agent OS, spec-kitty, specs.md, &hellip;</p>
+        </div>
+    </section>
+
+    <!-- ===========================================
+         SLIDE 9: BEST PRACTICES
+         =========================================== -->
+    <section class="slide light" data-title="Best Practices">
+        <div class="top-bar">
+            <span class="brand">Best Practices</span>
+            <span class="slide-meta">Best Practices</span>
+        </div>
+        <div class="orb orb-2"></div>
+        <div class="slide-content">
+            <div class="chip reveal">What Works</div>
+            <h2 class="reveal">SDD <span class="highlight">best practices</span></h2>
+            <div class="cards cards-3 reveal" style="margin-top: var(--element-gap);">
+                <div class="card">
+                    <div class="card-icon">&#x1F4C1;</div>
+                    <h3>Version your specs</h3>
+                    <p>Keep specs in the repo alongside code. Remove temporary planning artifacts.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">&#x1F6A6;</div>
+                    <h3>Spec before change</h3>
+                    <p>Always add or update the spec first &mdash; then implement. And read/review them ;-)</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">&#x1F500;</div>
+                    <h3>Stick to PR best practices</h3>
+                    <p>Structure changes into reviewable PRs. Focus review on specs and architecture.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">&#x1F3AF;</div>
+                    <h3>Right granularity</h3>
+                    <p>Not everything needs a spec. Match detail level to complexity &mdash; skip trivial items.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">&#x1F504;</div>
+                    <h3>Iterate on spec</h3>
+                    <p>Refine with AI before implementation, then keep evolving the spec afterwards.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">&#x1F9EA;</div>
+                    <h3>Include test criteria</h3>
+                    <p>Every spec defines how to verify success. Derive tests from it (e.g. e2e with Playwright).</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===========================================
+         SLIDE 11: CHALLENGES
+         =========================================== -->
+    <section class="slide" data-title="Challenges">
+        <div class="top-bar">
+            <span class="brand">Outlook</span>
+            <span class="slide-meta">Challenges</span>
+        </div>
+        <div class="orb orb-1"></div>
+        <div class="slide-content">
+            <div class="chip reveal">Open Questions</div>
+            <h2 class="reveal"><span class="highlight">Challenges</span></h2>
+            <div style="display: flex; flex-direction: column; gap: clamp(0.8rem, 1.8vw, 1.4rem); margin-top: var(--content-gap); max-width: min(90vw, 900px);">
+                <div class="reveal" style="display: flex; align-items: flex-start; gap: clamp(0.8rem, 1.5vw, 1.2rem);">
+                    <span style="font-family: var(--font-mono); font-size: clamp(2rem, 4vw, 3.5rem); font-weight: 800; color: var(--accent); opacity: 0.3; line-height: 1;">01</span>
+                    <div>
+                        <h3 style="font-size: var(--h3-size); color: var(--text-primary); margin-bottom: 0.2em;">&#x1F50D; Drift Detection in both directions</h3>
+                        <p style="font-size: var(--body-size); color: var(--text-secondary); line-height: 1.5;">Code evolves, specs go stale. How do you detect when implementation drifts from the spec?</p>
+                    </div>
+                </div>
+                <div class="reveal" style="display: flex; align-items: flex-start; gap: clamp(0.8rem, 1.5vw, 1.2rem);">
+                    <span style="font-family: var(--font-mono); font-size: clamp(2rem, 4vw, 3.5rem); font-weight: 800; color: var(--accent); opacity: 0.3; line-height: 1;">02</span>
+                    <div>
+                        <h3 style="font-size: var(--h3-size); color: var(--text-primary); margin-bottom: 0.2em;">&#x1F465; Inter-Team Collaboration</h3>
+                        <p style="font-size: var(--body-size); color: var(--text-secondary); line-height: 1.5;">Specs live per repo today. When multiple teams co-own a feature, who owns the spec? How do you align across boundaries?</p>
+                    </div>
+                </div>
+                <div class="reveal" style="display: flex; align-items: flex-start; gap: clamp(0.8rem, 1.5vw, 1.2rem);">
+                    <span style="font-family: var(--font-mono); font-size: clamp(2rem, 4vw, 3.5rem); font-weight: 800; color: var(--accent); opacity: 0.3; line-height: 1;">03</span>
+                    <div>
+                        <h3 style="font-size: var(--h3-size); color: var(--text-primary); margin-bottom: 0.2em;">&#x1F4E6; Specs across Multi-Repos</h3>
+                        <p style="font-size: var(--body-size); color: var(--text-secondary); line-height: 1.5;">A single feature may span services, frontends, and shared libraries. Keeping specs consistent across repositories is unsolved.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===========================================
+         SLIDE: CLOSING QUOTE
+         =========================================== -->
+    <section class="slide" data-title="Closing Quote">
+        <div class="top-bar">
+            <span class="brand">SDD</span>
+            <span class="slide-meta">Closing</span>
+        </div>
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="slide-content" style="justify-content: center; align-items: center; text-align: center;">
+            <div class="reveal" style="padding: 0 clamp(1rem, 4vw, 4rem);">
+                <div class="quote-text" style="text-align: left;">
+                    It's no longer about how fast we can write code, rather it's about how effectively we can articulate intent.
+                </div>
+                <div class="quote-attribution reveal" style="text-align: left;">InfoQ &middot; Krishnan, Betts &mdash; <a href="https://www.infoq.com/articles/enterprise-spec-driven-development/" target="_blank" rel="noopener" style="color: var(--accent); text-decoration: underline;">Enterprise SDD</a></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===========================================
+         SLIDE: THANK YOU / QUESTIONS
+         =========================================== -->
+    <section class="slide end-slide" data-title="End">
+        <div class="top-bar">
+            <span class="brand">Spec Driven Development</span>
+            <span class="slide-meta">Thank you</span>
+        </div>
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="slide-content" style="align-items: center; text-align: center;">
+            <h1 class="reveal" style="margin-bottom: var(--content-gap);">Questions<span class="highlight">?</span></h1>
+            <div class="two-col reveal" style="text-align: left; max-width: min(90vw, 900px); gap: clamp(1.5rem, 4vw, 4rem);">
+                <div>
+                    <h3 style="color: var(--accent); margin-bottom: var(--element-gap);">Contact</h3>
+                    <p class="body-text">Jannik Streek</p>
+                    <p class="body-text">B310 Digital</p>
+                    <p class="body-text" style="color: var(--text-secondary);">
+                        <a href="mailto:jannik@b310.de" style="color: var(--accent); text-decoration: none;">jannik@b310.de</a>
+                    </p>
+                </div>
+                <div>
+                    <h3 style="color: var(--accent); margin-bottom: var(--element-gap);">Further Reading</h3>
+                    <ul class="bullets" style="font-size: var(--small-size);">
+                        <li>InfoQ &middot; Krishnan, Betts &mdash; <a href="https://www.infoq.com/articles/enterprise-spec-driven-development/" target="_blank" rel="noopener" style="color: var(--text-secondary); text-decoration: underline;">Enterprise SDD</a></li>
+                        <li>InfoQ &middot; Reinhart &mdash; <a href="https://www.infoq.com/articles/spec-driven-development/" target="_blank" rel="noopener" style="color: var(--text-secondary); text-decoration: underline;">Spec Driven Development</a></li>
+                        <li>Joel on Software &middot; Spolsky &mdash; <a href="https://www.joelonsoftware.com/2000/10/03/painless-functional-specifications-part-2-whats-a-spec/" target="_blank" rel="noopener" style="color: var(--text-secondary); text-decoration: underline;">Painless Functional Specs</a></li>
+                        <li>martinfowler.com &middot; Böckeler &mdash; <a href="https://martinfowler.com/articles/exploring-gen-ai/sdd-3-tools.html" target="_blank" rel="noopener" style="color: var(--text-secondary); text-decoration: underline;">Exploring Gen AI</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===========================================
+       SLIDE PRESENTATION CONTROLLER
+       =========================================== -->
+    <script>
+        class SlidePresentation {
+            constructor() {
+                this.slides = document.querySelectorAll('.slide');
+                this.currentSlide = 0;
+                this.isScrolling = false;
+                this.touchStartY = 0;
+
+                // Framework chart step-through state
+                this.frameworkSlide = document.getElementById('frameworkSlide');
+                this.frameworkSlideIndex = Array.from(this.slides).indexOf(this.frameworkSlide);
+                this.chartLayers = ['chartDots', 'chartSections', 'chartNotes']; // reveal order: dots, sections, notes
+                this.chartStep = 0; // 0 = axes only, 1 = +dots, 2 = +sections, 3 = +notes
+
+                this.setupIntersectionObserver();
+                this.setupKeyboardNav();
+                this.setupTouchNav();
+                this.setupWheelNav();
+                this.setupProgressBar();
+                this.setupNavDots();
+
+                // Reveal first slide immediately
+                this.slides[0].classList.add('visible');
+            }
+
+            /* --- Framework chart: step forward/backward --- */
+            chartStepForward() {
+                if (this.chartStep < this.chartLayers.length) {
+                    const layer = document.getElementById(this.chartLayers[this.chartStep]);
+                    if (layer) layer.style.opacity = '1';
+                    this.chartStep++;
+                    if (this.chartStep === this.chartLayers.length) {
+                        const sub = document.getElementById('chartSubnote');
+                        if (sub) sub.style.opacity = '1';
+                    }
+                    return true; // consumed the event
+                }
+                return false; // all steps shown, navigate normally
+            }
+
+            chartStepBackward() {
+                if (this.chartStep > 0) {
+                    if (this.chartStep === this.chartLayers.length) {
+                        const sub = document.getElementById('chartSubnote');
+                        if (sub) sub.style.opacity = '0';
+                    }
+                    this.chartStep--;
+                    const layer = document.getElementById(this.chartLayers[this.chartStep]);
+                    if (layer) layer.style.opacity = '0';
+                    return true;
+                }
+                return false; // already at step 0, navigate normally
+            }
+
+            resetChart() {
+                this.chartStep = 0;
+                this.chartLayers.forEach(id => {
+                    const layer = document.getElementById(id);
+                    if (layer) layer.style.opacity = '0';
+                });
+                const sub = document.getElementById('chartSubnote');
+                if (sub) sub.style.opacity = '0';
+            }
+
+            isOnFrameworkSlide() {
+                return this.currentSlide === this.frameworkSlideIndex;
+            }
+
+            /* --- Intersection Observer: add .visible class --- */
+            setupIntersectionObserver() {
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('visible');
+                            const idx = Array.from(this.slides).indexOf(entry.target);
+                            if (idx !== -1) {
+                                this.currentSlide = idx;
+                                this.updateNavDots();
+                                this.updateProgressBar();
+                            }
+                        }
+                    });
+                }, { threshold: 0.5 });
+
+                this.slides.forEach(slide => observer.observe(slide));
+            }
+
+            /* --- Keyboard navigation --- */
+            setupKeyboardNav() {
+                document.addEventListener('keydown', (e) => {
+                    switch (e.key) {
+                        case 'ArrowDown':
+                        case 'ArrowRight':
+                        case ' ':
+                        case 'PageDown':
+                            e.preventDefault();
+                            if (this.isOnFrameworkSlide() && this.chartStepForward()) return;
+                            this.goToSlide(this.currentSlide + 1);
+                            break;
+                        case 'ArrowUp':
+                        case 'ArrowLeft':
+                        case 'PageUp':
+                            e.preventDefault();
+                            if (this.isOnFrameworkSlide() && this.chartStepBackward()) return;
+                            this.goToSlide(this.currentSlide - 1);
+                            break;
+                        case 'Home':
+                            e.preventDefault();
+                            this.goToSlide(0);
+                            break;
+                        case 'End':
+                            e.preventDefault();
+                            this.goToSlide(this.slides.length - 1);
+                            break;
+                    }
+                });
+            }
+
+            /* --- Touch / swipe support --- */
+            setupTouchNav() {
+                document.addEventListener('touchstart', (e) => {
+                    this.touchStartY = e.touches[0].clientY;
+                }, { passive: true });
+
+                document.addEventListener('touchend', (e) => {
+                    const diff = this.touchStartY - e.changedTouches[0].clientY;
+                    if (Math.abs(diff) > 50) {
+                        if (diff > 0) {
+                            this.goToSlide(this.currentSlide + 1);
+                        } else {
+                            this.goToSlide(this.currentSlide - 1);
+                        }
+                    }
+                }, { passive: true });
+            }
+
+            /* --- Mouse wheel navigation --- */
+            setupWheelNav() {
+                let wheelTimeout;
+                document.addEventListener('wheel', (e) => {
+                    if (this.isScrolling) return;
+                    clearTimeout(wheelTimeout);
+                    wheelTimeout = setTimeout(() => {
+                        if (e.deltaY > 30) {
+                            if (this.isOnFrameworkSlide() && this.chartStepForward()) return;
+                            this.goToSlide(this.currentSlide + 1);
+                        } else if (e.deltaY < -30) {
+                            if (this.isOnFrameworkSlide() && this.chartStepBackward()) return;
+                            this.goToSlide(this.currentSlide - 1);
+                        }
+                    }, 50);
+                }, { passive: true });
+            }
+
+            /* --- Go to specific slide --- */
+            goToSlide(index) {
+                if (index < 0 || index >= this.slides.length) return;
+                // Reset chart when leaving the framework slide
+                if (this.currentSlide === this.frameworkSlideIndex && index !== this.frameworkSlideIndex) {
+                    this.resetChart();
+                }
+                this.isScrolling = true;
+                this.currentSlide = index;
+                this.slides[index].scrollIntoView({ behavior: 'smooth' });
+                this.updateNavDots();
+                this.updateProgressBar();
+                setTimeout(() => { this.isScrolling = false; }, 800);
+            }
+
+            /* --- Progress bar --- */
+            setupProgressBar() {
+                this.progressBar = document.getElementById('progressBar');
+                this.updateProgressBar();
+            }
+
+            updateProgressBar() {
+                if (!this.progressBar) return;
+                const progress = ((this.currentSlide + 1) / this.slides.length) * 100;
+                this.progressBar.style.width = progress + '%';
+            }
+
+            /* --- Navigation dots --- */
+            setupNavDots() {
+                const container = document.getElementById('navDots');
+                if (!container) return;
+
+                this.slides.forEach((slide, i) => {
+                    const dot = document.createElement('button');
+                    dot.className = 'nav-dot' + (i === 0 ? ' active' : '');
+                    dot.setAttribute('aria-label', slide.dataset.title || `Slide ${i + 1}`);
+                    dot.addEventListener('click', () => this.goToSlide(i));
+                    container.appendChild(dot);
+                });
+            }
+
+            updateNavDots() {
+                const dots = document.querySelectorAll('.nav-dot');
+                dots.forEach((dot, i) => {
+                    dot.classList.toggle('active', i === this.currentSlide);
+                });
+                // Toggle light/dark theme for nav dots
+                const navDots = document.getElementById('navDots');
+                if (navDots && this.slides[this.currentSlide]) {
+                    navDots.classList.toggle('on-light', this.slides[this.currentSlide].classList.contains('light'));
+                }
+            }
+        }
+
+        // Initialize presentation
+        document.addEventListener('DOMContentLoaded', () => {
+            new SlidePresentation();
+        });
+    </script>
+
+</body>
+</html>
