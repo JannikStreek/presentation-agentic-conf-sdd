@@ -515,7 +515,6 @@
         .end-slide .slide-content {
             justify-content: center;
             align-items: center;
-            text-align: center;
         }
         @media (max-width: 768px) {
             .end-slide .slide-content {
@@ -1135,6 +1134,16 @@
                     <div>
                         <h3 style="font-size: var(--h3-size); color: var(--text-primary); margin-bottom: 0.2em;">&#x1F50D; Drift Detection in both directions</h3>
                         <p style="font-size: var(--body-size); color: var(--text-secondary); line-height: 1.5;">Code evolves, specs go stale. How do you detect when implementation drifts from the spec?</p>
+                        <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem;">
+                            <a href="https://github.com/b310-digital/speculatius" target="_blank" rel="noopener" style="display: inline-flex; align-items: center; gap: 0.35em; padding: 0.3em 0.7em; border-radius: 6px; background: rgba(207,255,178,0.08); border: 1px solid rgba(207,255,178,0.15); color: var(--accent); font-family: var(--font-mono); font-size: calc(var(--body-size) * 0.85); text-decoration: none; transition: background 0.2s, border-color 0.2s;">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style="flex-shrink:0;"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+                                speculatius
+                            </a>
+                            <a href="https://github.com/clay-good/spec-gen" target="_blank" rel="noopener" style="display: inline-flex; align-items: center; gap: 0.35em; padding: 0.3em 0.7em; border-radius: 6px; background: rgba(207,255,178,0.08); border: 1px solid rgba(207,255,178,0.15); color: var(--accent); font-family: var(--font-mono); font-size: calc(var(--body-size) * 0.85); text-decoration: none; transition: background 0.2s, border-color 0.2s;">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style="flex-shrink:0;"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+                                spec-gen
+                            </a>
+                        </div>
                     </div>
                 </div>
                 <div class="reveal" style="display: flex; align-items: flex-start; gap: clamp(0.8rem, 1.5vw, 1.2rem);">
@@ -1185,14 +1194,14 @@
         </div>
         <div class="orb orb-1"></div>
         <div class="orb orb-2"></div>
-        <div class="slide-content" style="align-items: center; text-align: center; justify-content: center; gap: clamp(0.8rem, 2vw, 1.5rem);">
-            <div class="reveal" style="display: flex; flex-direction: column; align-items: center; gap: 0.6rem;">
-                <p style="font-size: var(--body-size); color: var(--text-secondary); margin: 0; letter-spacing: 0.03em;">Slides available at: <sup style="color: var(--accent); font-size: 0.65em;">1</sup></p>
-                <div id="qr-code" style="border-radius: 12px; overflow: hidden; line-height: 0;"></div>
-            </div>
-            <h1 class="reveal" style="margin: 0;">Questions<span class="highlight">?</span></h1>
-            <div class="two-col reveal" style="text-align: left; max-width: min(90vw, 900px); gap: clamp(1.5rem, 4vw, 4rem);">
-                <div>
+        <div class="slide-content" style="justify-content: center; align-items: center; gap: clamp(1rem, 2.5vw, 1.8rem);">
+            <h1 class="reveal" style="margin: 0; text-align: center;">Questions<span class="highlight">?</span></h1>
+
+            <!-- Three-column grid: Contact | Further Reading | QR -->
+            <div class="reveal" style="display: grid; grid-template-columns: 1fr 1fr auto; column-gap: clamp(2rem, 5vw, 5rem); align-items: start; width: min(94vw, 1300px);">
+
+                <!-- Column 1: Contact -->
+                <div style="text-align: left;">
                     <h3 style="color: var(--accent); margin-bottom: var(--element-gap);">Contact</h3>
                     <p class="body-text">Jannik Streek</p>
                     <p class="body-text">B310 Digital</p>
@@ -1200,19 +1209,27 @@
                         <a href="mailto:jannik@b310.de" style="color: var(--accent); text-decoration: none;">jannik@b310.de</a>
                     </p>
                 </div>
-                <div>
+
+                <!-- Column 2: Further Reading -->
+                <div style="text-align: left;">
                     <h3 style="color: var(--accent); margin-bottom: var(--element-gap);">Further Reading</h3>
-                    <ul class="bullets" style="font-size: var(--small-size);">
+                    <ul class="bullets" style="font-size: calc(var(--small-size) * 0.7);">
                         <li>InfoQ &middot; Krishnan, Betts &mdash; <a href="https://www.infoq.com/articles/enterprise-spec-driven-development/" target="_blank" rel="noopener" style="color: var(--text-secondary); text-decoration: underline;">Enterprise SDD</a></li>
                         <li>InfoQ &middot; Reinhart &mdash; <a href="https://www.infoq.com/articles/spec-driven-development/" target="_blank" rel="noopener" style="color: var(--text-secondary); text-decoration: underline;">Spec Driven Development</a></li>
                         <li>Joel on Software &middot; Spolsky &mdash; <a href="https://www.joelonsoftware.com/2000/10/03/painless-functional-specifications-part-2-whats-a-spec/" target="_blank" rel="noopener" style="color: var(--text-secondary); text-decoration: underline;">Painless Functional Specs</a></li>
                         <li>martinfowler.com &middot; Böckeler &mdash; <a href="https://martinfowler.com/articles/exploring-gen-ai/sdd-3-tools.html" target="_blank" rel="noopener" style="color: var(--text-secondary); text-decoration: underline;">Exploring Gen AI</a></li>
                     </ul>
                 </div>
+
+                <!-- Column 3: QR Code -->
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem; margin-left: clamp(1rem, 3vw, 3rem);">
+                    <p style="font-size: var(--small-size); color: var(--text-secondary); margin: 0; letter-spacing: 0.03em;">Slides <sup style="color: var(--accent); font-size: 0.65em;">1</sup></p>
+                    <div id="qr-code" style="border-radius: 12px; overflow: hidden; line-height: 0;"></div>
+                    <p style="font-size: calc(var(--small-size) * 0.6); color: var(--text-secondary); margin: 0; opacity: 0.7; text-align: center; word-break: break-all;">
+                        <sup>1</sup> <a href="https://github.com/JannikStreek/presentation-agentic-conf-sdd" target="_blank" rel="noopener" style="color: var(--accent); text-decoration: underline;">github.com/JannikStreek/presentation-agentic-conf-sdd</a>
+                    </p>
+                </div>
             </div>
-            <p class="reveal" style="font-size: calc(var(--small-size) * 0.85); color: var(--text-secondary); margin: 0; opacity: 0.7;">
-                <sup>1</sup> Repo: <a href="https://github.com/JannikStreek/presentation-agentic-conf-sdd" target="_blank" rel="noopener" style="color: var(--accent); text-decoration: underline;">github.com/JannikStreek/presentation-agentic-conf-sdd</a>
-            </p>
         </div>
     </section>
 
@@ -1456,8 +1473,8 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const qrCode = new QRCodeStyling({
-                width: 320,
-                height: 320,
+                width: 420,
+                height: 420,
                 data: "https://jannikstreek.github.io/presentation-agentic-conf-sdd/spec-driven-development.html",
                 dotsOptions: {
                     color: "#ffffff",
